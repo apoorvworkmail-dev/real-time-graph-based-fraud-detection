@@ -68,6 +68,7 @@ api.interceptors.response.use(
 // ── Auth & Identity APIs ───────────────────────────────────────
 export const authApi = {
   login: (credentials) => api.post('/api/v1/auth/login', credentials),
+  register: (data) => api.post('/api/v1/auth/register', data),
   refresh: (data = {}) => api.post('/api/v1/auth/refresh', data),
   logout: () => api.post('/api/v1/auth/logout'),
   me: () => api.get('/api/v1/auth/me'),

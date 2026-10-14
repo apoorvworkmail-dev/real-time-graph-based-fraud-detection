@@ -24,6 +24,7 @@ from app.schemas.auth import (
     LoginRequest,
     RefreshTokenRequest,
     Token,
+    UserCreate,
     UserOut,
     WsTicketResponse,
 )
@@ -31,6 +32,31 @@ from app.services.user_service import user_service
 import jwt
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@router.post(
+    "/register",
+    response_model=UserOut,
+    status_code=201,
+    summary="Register a new user account (public)",
+)
+def register(payload: UserCreate, response: Response):
+    """
+    Public sign-up endpoint.
+    Creates a new user with the provided credentials and saves them to Neo4j.
+    Defaults to the 'fraud_analyst' role if no role is specified.
+    Returns the created user profile (no token — caller must login afterwards).
+    """
+    try:
+        new_user = user_service.create_user(payload)
+    except ValueError as exc:
+        err = str(exc)
+        if "already registered" in err:
+            raise HTTPException(status_code=409, detail=err)
+        raise HTTPException(status_code=400, detail=err)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {exc}")
+    return new_user
 
 
 @router.post("/login", response_model=Token, summary="Authenticate and acquire JWT access token")

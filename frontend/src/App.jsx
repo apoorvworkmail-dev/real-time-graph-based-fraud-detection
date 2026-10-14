@@ -22,10 +22,23 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [authTab, setAuthTab] = useState('login'); // 'login' | 'signup'
+
+  // Login state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState('');
+
+  // Signup state
+  const [signupFullName, setSignupFullName] = useState('');
+  const [signupUsername, setSignupUsername] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirm, setSignupConfirm] = useState('');
+  const [signupError, setSignupError] = useState('');
+  const [signupLoading, setSignupLoading] = useState(false);
 
   // Hook for 401 Unauthorized handling
   useEffect(() => {
@@ -64,6 +77,7 @@ export default function App() {
       return;
     }
     setLoginError('');
+    setLoginSuccess('');
     setLoginLoading(true);
     try {
       const res = await authApi.login({ username: username.trim(), password });
@@ -79,10 +93,52 @@ export default function App() {
     }
   };
 
+  const handleSignupSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setSignupError('');
+    if (!signupUsername.trim() || !signupEmail.trim() || !signupPassword) {
+      setSignupError('Username, email, and password are required.');
+      return;
+    }
+    if (signupPassword.length < 8) {
+      setSignupError('Password must be at least 8 characters.');
+      return;
+    }
+    if (signupPassword !== signupConfirm) {
+      setSignupError('Passwords do not match.');
+      return;
+    }
+    setSignupLoading(true);
+    try {
+      await authApi.register({
+        username: signupUsername.trim(),
+        email: signupEmail.trim(),
+        full_name: signupFullName.trim() || undefined,
+        password: signupPassword,
+      });
+      // Success — switch to login tab with username prefilled
+      setSignupFullName('');
+      setSignupUsername('');
+      setSignupEmail('');
+      setSignupPassword('');
+      setSignupConfirm('');
+      setAuthTab('login');
+      setUsername(signupUsername.trim().toLowerCase());
+      setPassword('');
+      setLoginSuccess('Account created! Please sign in with your new credentials.');
+    } catch (err) {
+      setSignupError(err.response?.data?.detail || 'Registration failed. Please try again.');
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
   const handleQuickPersona = (userKey, passVal) => {
+    setAuthTab('login');
     setUsername(userKey);
     setPassword(passVal);
     setLoginError('');
+    setLoginSuccess('');
   };
 
   const handleLogout = async () => {
@@ -94,7 +150,9 @@ export default function App() {
       setAuthToken(null);
       setCurrentUser(null);
       setLoginModalOpen(true);
+      setAuthTab('login');
       setLoginError('');
+      setLoginSuccess('');
     }
   };
 
@@ -211,94 +269,244 @@ export default function App() {
         )}
       </main>
 
-      {/* Login / Identity Modal */}
+      {/* Auth Modal — Login / Sign Up */}
       {loginModalOpen && (
         <div className="login-modal-overlay">
           <div className="login-modal-card">
             <div className="login-modal-header">
               <div className="login-brand">
                 <span className="brand-mark">F</span>
-                <h3>FraudGraph Security Sign-In</h3>
+                <h3>FraudGraph {authTab === 'login' ? 'Sign In' : 'Create Account'}</h3>
               </div>
-              <p>Sign in to access graph analytics, transaction monitoring, and case investigations.</p>
+              <p>
+                {authTab === 'login'
+                  ? 'Sign in to access graph analytics, transaction monitoring, and case investigations.'
+                  : 'Register a new investigator account. Your data is saved to the Neo4j database.'}
+              </p>
             </div>
 
-            {loginError && <div className="login-error-banner">{loginError}</div>}
-
-            <form onSubmit={handleLoginSubmit} className="login-form">
-              <div className="form-group">
-                <label htmlFor="username-input">Username or Email</label>
-                <input
-                  id="username-input"
-                  type="text"
-                  className="login-input"
-                  placeholder="e.g. analyst_priya"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  autoComplete="username"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password-input">Password</label>
-                <input
-                  id="password-input"
-                  type="password"
-                  className="login-input"
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn-login-submit" disabled={loginLoading}>
-                {loginLoading ? 'Signing In...' : 'Sign In to Investigation Console'}
+            {/* Tab switcher */}
+            <div className="auth-tabs">
+              <button
+                type="button"
+                className={`auth-tab-btn ${authTab === 'login' ? 'active' : ''}`}
+                onClick={() => { setAuthTab('login'); setSignupError(''); setLoginError(''); }}
+              >
+                Sign In
               </button>
-            </form>
-
-            <div className="persona-quick-switcher">
-              <div className="persona-switcher-title">DEMO ROLE PERSONAS (1-CLICK LOAD)</div>
-              <div className="persona-buttons">
-                <button
-                  type="button"
-                  className="persona-btn admin"
-                  onClick={() => handleQuickPersona('admin', 'Admin@FraudGraph2026!')}
-                >
-                  <span className="persona-icon">👑</span>
-                  <div>
-                    <strong>Admin</strong>
-                    <small>Full controls & users</small>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  className="persona-btn analyst"
-                  onClick={() => handleQuickPersona('analyst_priya', 'AnalystPass2026!')}
-                >
-                  <span className="persona-icon">🔍</span>
-                  <div>
-                    <strong>Fraud Analyst</strong>
-                    <small>Case ops & graph</small>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  className="persona-btn compliance"
-                  onClick={() => handleQuickPersona('officer_chen', 'CompliancePass2026!')}
-                >
-                  <span className="persona-icon">⚖</span>
-                  <div>
-                    <strong>Compliance</strong>
-                    <small>Audit & resolutions</small>
-                  </div>
-                </button>
-              </div>
+              <button
+                type="button"
+                className={`auth-tab-btn ${authTab === 'signup' ? 'active' : ''}`}
+                onClick={() => { setAuthTab('signup'); setLoginError(''); setLoginSuccess(''); setSignupError(''); }}
+              >
+                Create Account
+              </button>
             </div>
+
+            {/* ── LOGIN TAB ─────────────────────────────────── */}
+            {authTab === 'login' && (
+              <>
+                {loginError && <div className="login-error-banner">{loginError}</div>}
+                {loginSuccess && <div className="login-success-banner">{loginSuccess}</div>}
+
+                <form onSubmit={handleLoginSubmit} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="username-input">Username or Email</label>
+                    <input
+                      id="username-input"
+                      type="text"
+                      className="login-input"
+                      placeholder="e.g. analyst_priya"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      autoComplete="username"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="password-input">Password</label>
+                    <input
+                      id="password-input"
+                      type="password"
+                      className="login-input"
+                      placeholder="••••••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                      required
+                    />
+                  </div>
+
+                  <button type="submit" className="btn-login-submit" disabled={loginLoading}>
+                    {loginLoading ? 'Signing In...' : 'Sign In to Investigation Console'}
+                  </button>
+                </form>
+
+                <div className="persona-quick-switcher">
+                  <div className="persona-switcher-title">DEMO ROLE PERSONAS (1-CLICK LOAD)</div>
+                  <div className="persona-buttons">
+                    <button
+                      type="button"
+                      className="persona-btn admin"
+                      onClick={() => handleQuickPersona('admin', 'Admin@FraudGraph2026!')}
+                    >
+                      <span className="persona-icon">👑</span>
+                      <div>
+                        <strong>Admin</strong>
+                        <small>Full controls &amp; users</small>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="persona-btn analyst"
+                      onClick={() => handleQuickPersona('analyst_priya', 'AnalystPass2026!')}
+                    >
+                      <span className="persona-icon">🔍</span>
+                      <div>
+                        <strong>Fraud Analyst</strong>
+                        <small>Case ops &amp; graph</small>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="persona-btn compliance"
+                      onClick={() => handleQuickPersona('officer_chen', 'CompliancePass2026!')}
+                    >
+                      <span className="persona-icon">⚖</span>
+                      <div>
+                        <strong>Compliance</strong>
+                        <small>Audit &amp; resolutions</small>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="auth-switch-hint">
+                  New user?{' '}
+                  <button
+                    type="button"
+                    className="btn-auth-switch"
+                    onClick={() => { setAuthTab('signup'); setLoginError(''); setLoginSuccess(''); }}
+                  >
+                    Create an account →
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* ── SIGNUP TAB ────────────────────────────────── */}
+            {authTab === 'signup' && (
+              <>
+                {signupError && <div className="login-error-banner">{signupError}</div>}
+
+                <form onSubmit={handleSignupSubmit} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="signup-fullname">
+                      Full Name <span className="field-optional">(optional)</span>
+                    </label>
+                    <input
+                      id="signup-fullname"
+                      type="text"
+                      className="login-input"
+                      placeholder="e.g. Jane Doe"
+                      value={signupFullName}
+                      onChange={(e) => setSignupFullName(e.target.value)}
+                      autoComplete="name"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="signup-username">
+                      Username <span className="field-required">*</span>
+                    </label>
+                    <input
+                      id="signup-username"
+                      type="text"
+                      className="login-input"
+                      placeholder="Minimum 3 characters"
+                      value={signupUsername}
+                      onChange={(e) => setSignupUsername(e.target.value)}
+                      autoComplete="username"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="signup-email">
+                      Email Address <span className="field-required">*</span>
+                    </label>
+                    <input
+                      id="signup-email"
+                      type="email"
+                      className="login-input"
+                      placeholder="you@example.com"
+                      value={signupEmail}
+                      onChange={(e) => setSignupEmail(e.target.value)}
+                      autoComplete="email"
+                      required
+                    />
+                  </div>
+
+                  <div className="signup-password-row">
+                    <div className="form-group">
+                      <label htmlFor="signup-password">
+                        Password <span className="field-required">*</span>
+                      </label>
+                      <input
+                        id="signup-password"
+                        type="password"
+                        className="login-input"
+                        placeholder="Min 8 characters"
+                        value={signupPassword}
+                        onChange={(e) => setSignupPassword(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="signup-confirm">
+                        Confirm Password <span className="field-required">*</span>
+                      </label>
+                      <input
+                        id="signup-confirm"
+                        type="password"
+                        className={`login-input ${signupConfirm && signupPassword !== signupConfirm ? 'input-error' : ''}`}
+                        placeholder="Repeat password"
+                        value={signupConfirm}
+                        onChange={(e) => setSignupConfirm(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="signup-role-note">
+                    <span>🔒</span>
+                    New accounts are created with the <strong>Fraud Analyst</strong> role.
+                    Admins can promote accounts later.
+                  </div>
+
+                  <button type="submit" className="btn-login-submit btn-signup" disabled={signupLoading}>
+                    {signupLoading ? 'Creating Account...' : 'Create Account & Save to Database'}
+                  </button>
+                </form>
+
+                <div className="auth-switch-hint">
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    className="btn-auth-switch"
+                    onClick={() => { setAuthTab('login'); setSignupError(''); }}
+                  >
+                    Sign in →
+                  </button>
+                </div>
+              </>
+            )}
 
             {currentUser && (
               <div className="login-modal-footer">
