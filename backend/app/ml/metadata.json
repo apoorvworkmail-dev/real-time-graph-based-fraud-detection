@@ -1,0 +1,254 @@
+{
+  "modelVersion": "1.0.0-rf-graph",
+  "modelType": "RandomForestClassifier",
+  "baselineType": "LogisticRegression",
+  "trainingDate": "2026-10-12T18:03:28.584075+00:00",
+  "randomSeed": 42,
+  "dataset": {
+    "totalEntities": 60,
+    "trainSamples": 45,
+    "testSamples": 15,
+    "fraudPrevalence": 0.1667,
+    "trainDistribution": {
+      "fraud": 8,
+      "legit": 37
+    },
+    "testDistribution": {
+      "fraud": 2,
+      "legit": 13
+    }
+  },
+  "featureNames": [
+    "out_degree",
+    "in_degree",
+    "total_out_volume",
+    "total_in_volume",
+    "net_flow",
+    "avg_out_amount",
+    "max_out_amount",
+    "unique_receivers",
+    "unique_senders",
+    "counterparty_ratio",
+    "device_count",
+    "shared_device_count",
+    "location_count",
+    "high_risk_loc_tx_count",
+    "high_risk_loc_ratio",
+    "velocity_burst_count",
+    "cycle_member"
+  ],
+  "featureImportances": [
+    {
+      "feature": "counterparty_ratio",
+      "importance": 0.2142
+    },
+    {
+      "feature": "unique_senders",
+      "importance": 0.1951
+    },
+    {
+      "feature": "shared_device_count",
+      "importance": 0.1513
+    },
+    {
+      "feature": "in_degree",
+      "importance": 0.0928
+    },
+    {
+      "feature": "total_in_volume",
+      "importance": 0.078
+    },
+    {
+      "feature": "total_out_volume",
+      "importance": 0.0408
+    },
+    {
+      "feature": "high_risk_loc_ratio",
+      "importance": 0.0388
+    },
+    {
+      "feature": "avg_out_amount",
+      "importance": 0.0343
+    },
+    {
+      "feature": "high_risk_loc_tx_count",
+      "importance": 0.0322
+    },
+    {
+      "feature": "velocity_burst_count",
+      "importance": 0.0285
+    },
+    {
+      "feature": "location_count",
+      "importance": 0.0269
+    },
+    {
+      "feature": "max_out_amount",
+      "importance": 0.0189
+    },
+    {
+      "feature": "unique_receivers",
+      "importance": 0.0138
+    },
+    {
+      "feature": "net_flow",
+      "importance": 0.0121
+    },
+    {
+      "feature": "device_count",
+      "importance": 0.0106
+    },
+    {
+      "feature": "out_degree",
+      "importance": 0.0088
+    },
+    {
+      "feature": "cycle_member",
+      "importance": 0.0027
+    }
+  ],
+  "evaluation": {
+    "primaryModel": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 13,
+        "fp": 0,
+        "fn": 0,
+        "tp": 2
+      }
+    },
+    "baselineModel": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0,
+      "confusion_matrix": {
+        "tn": 13,
+        "fp": 0,
+        "fn": 0,
+        "tp": 2
+      }
+    },
+    "ruleBasedBaseline": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667
+    }
+  },
+  "thresholdSelection": {
+    "defaultClassificationThreshold": 0.5,
+    "rationale": "Balanced threshold calibrated to penalize false negatives (missed fraud rings) while containing false positives."
+  },
+  "testPredictions": [
+    {
+      "clientId": "CLT024",
+      "groundTruth": 0,
+      "mlProb": 0.04,
+      "mlPred": 0,
+      "rulePred": 1
+    },
+    {
+      "clientId": "CLT029",
+      "groundTruth": 0,
+      "mlProb": 0.02,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT023",
+      "groundTruth": 0,
+      "mlProb": 0.0,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT046",
+      "groundTruth": 0,
+      "mlProb": 0.07,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT049",
+      "groundTruth": 0,
+      "mlProb": 0.06,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT035",
+      "groundTruth": 1,
+      "mlProb": 0.79,
+      "mlPred": 1,
+      "rulePred": 1
+    },
+    {
+      "clientId": "CLT032",
+      "groundTruth": 1,
+      "mlProb": 0.92,
+      "mlPred": 1,
+      "rulePred": 1
+    },
+    {
+      "clientId": "CLT052",
+      "groundTruth": 0,
+      "mlProb": 0.02,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT021",
+      "groundTruth": 0,
+      "mlProb": 0.0,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT015",
+      "groundTruth": 0,
+      "mlProb": 0.0,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT019",
+      "groundTruth": 0,
+      "mlProb": 0.02,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT008",
+      "groundTruth": 0,
+      "mlProb": 0.0,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT011",
+      "groundTruth": 0,
+      "mlProb": 0.15,
+      "mlPred": 0,
+      "rulePred": 0
+    },
+    {
+      "clientId": "CLT053",
+      "groundTruth": 0,
+      "mlProb": 0.0,
+      "mlPred": 0,
+      "rulePred": 1
+    },
+    {
+      "clientId": "CLT050",
+      "groundTruth": 0,
+      "mlProb": 0.01,
+      "mlPred": 0,
+      "rulePred": 0
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "risk_scoring_latency_ms": {
+    "repetitions": 100,
+    "min": 0.0043,
+    "max": 0.0212,
+    "mean": 0.0047,
+    "p50": 0.0044,
+    "p95": 0.0048,
+    "p99": 0.0211
+  },
+  "api_endpoints": {
+    "/health": {
+      "method": "GET",
+      "sample_size": 5,
+      "status_code": 200,
+      "all_200_or_201": true,
+      "mean_ms": 2279.14,
+      "p50_ms": 2276.01,
+      "p95_ms": 2296.7,
+      "min_ms": 2266.59,
+      "max_ms": 2296.7
+    },
+    "/api/v1/auth/login": {
+      "method": "POST",
+      "sample_size": 5,
+      "status_code": 200,
+      "all_200_or_201": true,
+      "mean_ms": 244.02,
+      "p50_ms": 235.47,
+      "p95_ms": 278.83,
+      "min_ms": 231.37,
+      "max_ms": 278.83
+    },
+    "/api/v1/ml/info": {
+      "method": "GET",
+      "sample_size": 5,
+      "status_code": 200,
+      "all_200_or_201": true,
+      "mean_ms": 4.39,
+      "p50_ms": 4.28,
+      "p95_ms": 5.14,
+      "min_ms": 4.0,
+      "max_ms": 5.14
+    },
+    "/api/v1/cases": {
+      "method": "GET",
+      "sample_size": 5,
+      "status_code": 200,
+      "all_200_or_201": true,
+      "mean_ms": 9104.9,
+      "p50_ms": 9111.34,
+      "p95_ms": 9121.37,
+      "min_ms": 9081.61,
+      "max_ms": 9121.37
+    },
+    "/api/v1/stream/status": {
+      "method": "GET",
+      "sample_size": 5,
+      "status_code": 200,
+      "all_200_or_201": true,
+      "mean_ms": 8.94,
+      "p50_ms": 4.86,
+      "p95_ms": 25.79,
+      "min_ms": 3.92,
+      "max_ms": 25.79
+    }
+  },
+  "transaction_throughput": {
+    "transactions_processed": 1000,
+    "elapsed_seconds": 0.0157,
+    "throughput_tx_per_sec": 63603.9
+  },
+  "failure_recovery": {
+    "malformed_jwt": {
+      "status_code": 401,
+      "handled_gracefully": true
+    },
+    "concurrency_conflict": {
+      "status_code": 409,
+      "handled_gracefully": true
+    }
+  }
+}
